@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Upload Flow Step 1</title>
+
+    <!-- Office JavaScript API -->
+    <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js"></script>
+
+    <!-- Fluent UI styles (if you need them for styling) -->
+    <link rel="stylesheet" href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/11.0.0/css/fabric.min.css"/>
+
+    <!-- Custom styles -->
+    <link href="taskpane.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body class="ms-Fabric">
+    <header class="ms-bgColor-neutralLighter ms-font-m ms-fontColor-neutralPrimary">
+        <h1 class="ms-font-l">Upload Flow Step 1</h1>
+    </header>
+    
+    <main id="app-body" class="ms-welcome__main">
+        <p class="ms-font-m">This is the first step in the upload flow.</p>
+        
+        <!-- Back Button -->
+        <button id="backButton" class="ms-Button ms-Button--primary">
+            <span class="ms-Button-label">Back</span>
+        </button>
+    </main>
+
+    <!-- Wizard script -->
+    <script>
+        document.getElementById('backButton').addEventListener('click', function() {
+            Office.context.ui.messageParent("goBack");
+        });
+    </script>
+</body>
+
+</html>
