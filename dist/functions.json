@@ -65,9 +65,33 @@
             "result": {}
         },
         {
-            "description": "This custom function returns \"Hello, World!\".",
+            "description": "This custom function sends a request to the server with text and number parameters, and an optional delay.",
             "id": "UBSFIN",
             "name": "UBSFIN",
+            "parameters": [
+                {
+                    "description": "The input text.",
+                    "name": "text",
+                    "type": "string"
+                },
+                {
+                    "description": "The multiplier number.",
+                    "name": "number",
+                    "type": "number"
+                },
+                {
+                    "description": "Optional delay in seconds before returning the result.",
+                    "name": "delay",
+                    "optional": true,
+                    "type": "number"
+                }
+            ],
+            "result": {}
+        },
+        {
+            "description": "This custom function returns \"Hello, World!\".",
+            "id": "HELLO",
+            "name": "HELLO",
             "parameters": [],
             "result": {}
         }
