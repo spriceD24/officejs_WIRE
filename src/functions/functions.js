@@ -118,6 +118,98 @@ function HELLO() {
 }
 
 
+
+/**
+ * @customfunction
+ * @param {string[][]} texts Array of text inputs
+ * @param {number[][]} numbers Array of number inputs
+ * @param {number} [delay] Optional delay parameter
+ * @returns {string[][]} Array of results
+ */
+async function UBSFINBATCH(texts, numbers, delay) {
+  try {
+    console.log("UBSFIN Batch");
+    logtxt = '';
+    // Flatten the input arrays
+    const flatTexts = texts.flat();
+    const flatNumbers = numbers.flat();
+
+    // Construct the API URL with query parameters
+    let url = `http://localhost:5000/wire/batch`;
+
+    console.log(`Calling URL: ${url}`);
+
+    // Prepare the request body
+    const requestBody = {
+      inputs: flatTexts.map((text, index) => ({
+        text: text,
+        number: flatNumbers[index]
+      }))
+    };
+
+    // Add the delay parameter if provided and is a positive number
+    if (typeof delay !== 'undefined' && delay > 0) {
+      requestBody.delay = delay;
+    }
+    logtxt = JSON.stringify(requestBody)
+    // Make the API request
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      mode: 'cors',
+      body: JSON.stringify(requestBody)
+    });
+
+    // Check if the response is ok (status 200)
+    if (!response.ok) {
+      throw new Error(`Error: ${response.statusText}`);
+    }
+
+    // Parse the JSON response
+    const data = await response.json();
+
+    // Reshape the results to match the input shape
+    return reshapeResults(data.results, texts.length, texts[0].length);
+  } catch (error) {
+    // Log the full error object to the console
+    console.error('UBSFIN Error:', error);
+
+    // Prepare a detailed error message
+    let errorMessage = "Error calling API: ";
+    if (error instanceof Error) {
+        errorMessage += `${error.name} - ${error.message}`;
+        if (error.stack) {
+            console.error('Stack trace:', error.stack);
+        }
+    } else {
+        errorMessage += String(error);
+    }
+
+    // If it's a network error, add more details
+    if (error instanceof TypeError && error.message.includes('network')) {
+        errorMessage += " (Network error, check your connection)";
+    }
+
+    // Log the error message
+    console.error(errorMessage);
+    errorMessage = errorMessage +', txt='+logtxt
+    // Return the error message for each cell in the input range
+    return texts.map(row => row.map(() => errorMessage));
+  }
+}
+
+// Helper function to reshape the flat array of results into a 2D array
+function reshapeResults(flatResults, rows, cols) {
+  const result = [];
+  for (let i = 0; i < rows; i++) {
+    result.push(flatResults.slice(i * cols, (i + 1) * cols));
+  }
+  return result;
+}
+
 // You must include this line to make the function available in Excel.
 CustomFunctions.associate("UBSFIN", UBSFIN);
 CustomFunctions.associate("HELLO", HELLO);
+CustomFunctions.associate("UBSFINBATCH", UBSFINBATCH);

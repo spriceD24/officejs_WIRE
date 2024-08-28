@@ -94,6 +94,34 @@
             "name": "HELLO",
             "parameters": [],
             "result": {}
+        },
+        {
+            "id": "UBSFINBATCH",
+            "name": "UBSFINBATCH",
+            "parameters": [
+                {
+                    "description": "Array of text inputs",
+                    "dimensionality": "matrix",
+                    "name": "texts",
+                    "type": "string"
+                },
+                {
+                    "description": "Array of number inputs",
+                    "dimensionality": "matrix",
+                    "name": "numbers",
+                    "type": "number"
+                },
+                {
+                    "description": "Optional delay parameter",
+                    "name": "delay",
+                    "optional": true,
+                    "type": "number"
+                }
+            ],
+            "result": {
+                "dimensionality": "matrix",
+                "type": "string"
+            }
         }
     ]
 }

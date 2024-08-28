@@ -5,6 +5,7 @@ Office.onReady((info) => {
         document.getElementById("validateButton").addEventListener("click", validateData);
         document.getElementById("startWizardButton").addEventListener("click", startWizard);
         document.getElementById("backButton").addEventListener("click", goBack);
+        document.getElementById("uploadButton").addEventListener("click", uploadModel);
     }
 });
 
@@ -91,6 +92,48 @@ async function validateData() {
         document.getElementById("result").innerText = `Error: ${error.message}, data = ${JSON.stringify(data)}`;
     }
 }
+
+
+async function uploadModel() {
+    try {
+        await Excel.run(async (context) => {
+            // Get the current worksheet
+            const sheet = context.workbook.worksheets.getActiveWorksheet();
+            
+            // Get the used range of the worksheet
+            const range = sheet.getUsedRange();
+            range.load("values");
+
+            await context.sync();
+
+            // Convert the range values to a CSV string
+            const csvContent = range.values.map(row => row.join(",")).join("\n");
+
+            // Convert the CSV string to a Blob
+            const blob = new Blob([csvContent], { type: "text/csv" });
+
+            // Prepare the FormData object for the POST request
+            const formData = new FormData();
+            formData.append('file', blob, 'workbook.csv');
+
+            // Make the HTTP POST request to upload the file
+            const response = await fetch('http://localhost:5000/uploadModel', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                document.getElementById("result").innerText = "Upload successful!";
+            } else {
+                document.getElementById("result").innerText = "Upload failed!";
+            }
+        });
+    } catch (error) {
+        console.error(error);
+        document.getElementById("result").innerText = `Error: ${error.message}`;
+    }
+}
+
 
 function startWizard() {
     // Hide main content and show wizard content

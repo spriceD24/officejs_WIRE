@@ -94,6 +94,29 @@
       box-shadow: 0 0 0 2px rgba(221, 242, 130, 0.5); /* Adds a subtle outline on focus */
   }
   
+
+  .ms-Button.ms-Button--upload {
+    background-color: #bce1f7; /* Light red color */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color:#333;
+    border-radius: 5px;
+    margin-top: 10px; /* Adds some space between buttons */
+}
+
+.ms-Button.ms-Button--upload:hover {
+    background-color: #bce1f7; /* Slightly lighter red on hover */
+    cursor: pointer;
+}
+
+.ms-Button.ms-Button--upload:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #bce1f7; /* Adds a subtle outline on focus */
+}
+
   .ms-Button {
       margin-bottom: 10px; /* Adds 10px space below each button */
       width: 100%; /* Optional: makes all buttons the same width */
