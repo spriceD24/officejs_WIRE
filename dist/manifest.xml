@@ -11,7 +11,6 @@
   <SupportUrl DefaultValue="https://www.contoso.com/help"/>
   <AppDomains>
     <AppDomain>https://www.contoso.com</AppDomain>
-     <AppDomain>http://localhost:5000</AppDomain>
   </AppDomains>
   <Hosts>
     <Host Name="Workbook"/>

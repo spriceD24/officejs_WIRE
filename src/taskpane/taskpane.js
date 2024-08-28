@@ -96,37 +96,64 @@ async function validateData() {
 
 async function uploadModel() {
     try {
-        await Excel.run(async (context) => {
-            // Get the current worksheet
-            const sheet = context.workbook.worksheets.getActiveWorksheet();
-            
-            // Get the used range of the worksheet
-            const range = sheet.getUsedRange();
-            range.load("values");
+        const isOnline = Office.context.platform === Office.PlatformType.OfficeOnline;
+        const sliceSize = isOnline ? 4194304 : 2097152; // 4MB for online, 2MB for desktop
 
-            await context.sync();
+        return new Promise((resolve, reject) => {
+            Office.context.document.getFileAsync(Office.FileType.Compressed, { sliceSize }, async (result) => {
+                if (result.status === Office.AsyncResultStatus.Succeeded) {
+                    const myFile = result.value;
+                    let sliceCount = myFile.sliceCount;
+                    let fileContent = [];
 
-            // Convert the range values to a CSV string
-            const csvContent = range.values.map(row => row.join(",")).join("\n");
+                    // Read all slices
+                    for (let i = 0; i < sliceCount; i++) {
+                        await new Promise((sliceResolve, sliceReject) => {
+                            myFile.getSliceAsync(i, (sliceResult) => {
+                                if (sliceResult.status === Office.AsyncResultStatus.Succeeded) {
+                                    fileContent.push(sliceResult.value.data);
+                                    sliceResolve();
+                                } else {
+                                    sliceReject(sliceResult.error);
+                                }
+                            });
+                        });
+                    }
 
-            // Convert the CSV string to a Blob
-            const blob = new Blob([csvContent], { type: "text/csv" });
+                    // Combine all slices into a single Uint8Array
+                    const combinedContent = new Uint8Array(fileContent.reduce((acc, val) => [...acc, ...new Uint8Array(val)], []));
 
-            // Prepare the FormData object for the POST request
-            const formData = new FormData();
-            formData.append('file', blob, 'workbook.csv');
+                    // Create a Blob from the Uint8Array
+                    const blob = new Blob([combinedContent], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
 
-            // Make the HTTP POST request to upload the file
-            const response = await fetch('http://localhost:5000/uploadModel', {
-                method: 'POST',
-                body: formData
+                    // Prepare the FormData object for the POST request
+                    const formData = new FormData();
+                    formData.append('file', blob, 'workbook.xlsx');
+
+                    try {
+                        // Make the HTTP POST request to upload the file
+                        const response = await fetch('http://localhost:5000/uploadModel', {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        if (response.ok) {
+                            document.getElementById("result").innerText = "Upload successful!";
+                        } else {
+                            document.getElementById("result").innerText = "Upload failed!";
+                        }
+                    } catch (error) {
+                        console.error(error);
+                        document.getElementById("result").innerText = `Error: ${error.message}`;
+                    }
+
+                    // Close the file when we're done with it
+                    myFile.closeAsync();
+                    resolve();
+                } else {
+                    reject(new Error(result.error.message));
+                }
             });
-
-            if (response.ok) {
-                document.getElementById("result").innerText = "Upload successful!";
-            } else {
-                document.getElementById("result").innerText = "Upload failed!";
-            }
         });
     } catch (error) {
         console.error(error);
@@ -134,6 +161,11 @@ async function uploadModel() {
     }
 }
 
+// Helper function to log messages with platform information
+function logMessage(message) {
+    const platform = Office.context.platform === Office.PlatformType.OfficeOnline ? "Excel Online" : "Excel Desktop";
+    console.log(`[${platform}] ${message}`);
+}
 
 function startWizard() {
     // Hide main content and show wizard content

@@ -151,7 +151,7 @@ async function UBSFINBATCH(texts, numbers, delay) {
     if (typeof delay !== 'undefined' && delay > 0) {
       requestBody.delay = delay;
     }
-    logtxt = JSON.stringify(requestBody)
+    //logtxt = JSON.stringify(requestBody)
     // Make the API request
     const response = await fetch(url, {
       method: 'POST',
@@ -174,7 +174,7 @@ async function UBSFINBATCH(texts, numbers, delay) {
     return reshapeResults(data.results, texts.length, texts[0].length);
   } catch (error) {
     // Log the full error object to the console
-    console.error('UBSFIN Error:', error);
+    console.error('UBSFINBatch Error:', error);
 
     // Prepare a detailed error message
     let errorMessage = "Error calling API: ";
